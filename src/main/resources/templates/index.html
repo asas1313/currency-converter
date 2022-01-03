@@ -1,0 +1,105 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Currencies portal</title>
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <header>
+        <h1>Valiutų kursų portalas</h1>
+    </header>
+    <h5>Pasirinkite konkrečią valiutą, kad pamatyti jos kursų istorija:</h5>
+    <form th:action="@{/}" th:method="post" th:object="${formModel}">
+
+        <label for="start">Data nuo:</label>
+        <input type="date" id="start" th:name="dtFrom" th:value="${formModel.dtFrom}">
+
+        <label for="end">Data iki:</label>
+        <input type="date" id="end" th:name="dtTo" th:value="${formModel.dtTo}">
+
+        <select th:field="*{selectedCurrency}" th:name="selectedCurrency">
+            <option th:value="${formModel.selectedCurrency}">
+                Pasirinkite valiutą
+            </option>
+            <option th:each="currency: ${currencies}"
+                    th:text="${currency.description}"
+                    th:value="${currency.currency}">
+            </option>
+        </select>
+        <input type="submit" value="Parodyti istoriją"/>
+
+        <!-- This section should be hidden by default and shown when there is currency selected -->
+        <div th:if="${formModel.historyFormItems.size() > 0}">
+            <br/>
+            <h5>Kursų istorija:</h5>
+
+            <table class="table" border="solid">
+                <thead>
+                <tr>
+                    <td>Tipas</td>
+                    <td>Data</td>
+                    <td>Valiuta</td>
+                    <td>Kiekis</td>
+                    <td>Antra valiuta</td>
+                    <td>Antros valiutos kiekis</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${formModel.historyFormItems}">
+                    <td th:text="${item.type}"></td>
+                    <td th:text="${item.date}"></td>
+                    <td th:text="${item.currencyAmount[0].currency}"></td>
+                    <td th:text="${item.currencyAmount[0].amount}"></td>
+                    <td th:text="${item.currencyAmount[1].currency}"></td>
+                    <td th:text="${item.currencyAmount[1].amount}"></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </form>
+    <br/>
+    <br/>
+    <h5>Dabartinių valiutos kursų skaičiuoklė</h5>
+    <form th:action="@{/exchange}" th:method="post" th:object="${formModel}">
+        <label for="initialCurrencyAmount">Suma:</label>
+        <input type="number"
+               id="initialCurrencyAmount"
+               th:name="initialCurrencyAmount"
+               th:value="${formModel.initialCurrencyAmount}"
+        />
+        <label for="initialCurrencyAmount">Suma:</label>
+        <label for="exchangeCurrency"> valiuta: </label>
+        <select th:field="*{exchangeCurrency}" th:name="exchangeCurrency" id="exchangeCurrency">
+            <option th:value="${formModel.exchangeCurrency}"
+                    th:text="${exchangeCurrencyText}"
+            >Pasirinkite valiutą</option>
+            <option th:each="currency: ${currencies}"
+                    th:text="${currency.description}"
+                    th:value="${currency.currency}"></option>
+        </select>
+        <input type="submit" value="Paskaičiuoti"/>
+        <br/>
+        <label for="currentFxRateForCurrency">Pasirinktos valiutos kursas</label>
+        <input type="number"
+               id="currentFxRateForCurrency"
+               th:value="${formModel.currentFxRateForCurrency}"
+               disabled
+        />
+        <label for="calculatedAmount">Suma pasirinkta valiuta</label>
+        <input type="text"
+               id="calculatedAmount"
+               th:value="${formModel.calculatedAmount}"
+               disabled
+        />
+    </form>
+<footer class="info">
+    <p>Implemented by Andrius</p>
+</footer>
+    <script type="text/javascript" th:src="@{/js/app.js}"></script>
+</body>
+</html>
